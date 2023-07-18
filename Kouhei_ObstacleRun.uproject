@@ -7,7 +7,10 @@
 		{
 			"Name": "Kouhei_ObstacleRun",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
 		}
 	],
 	"Plugins": [
