@@ -12,24 +12,33 @@ ABallPlayer::ABallPlayer()
 	// Set this pawn to be controlled by the lowest-numbered player (このポーンが最小値のプレイヤーで制御されるように設定)
 	//AutoPossessPlayer = EAutoReceiveInput::Player0;
 
+	//SceneComponentを作成する
+	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
+
+	//SceneComponentをRootComponentに設定する
+	RootComponent = DefaultSceneRoot;
+
 	//StaticMeshComponentを追加し、RootComponentに設定する
-	Sphere = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
-	RootComponent = Sphere;
+	Character = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("USkeletalMeshComponent"));
+	//RootComponent = Character;
 
 	//StaticMeshをLaodしてStaticMeshComponentのStaticMeshに設定する
-	UStaticMesh* Mesh = LoadObject<UStaticMesh>(NULL, TEXT("/Engine/BasicShapes/Sphere"), NULL, LOAD_None, NULL);
+	USkeletalMesh* Mesh = LoadObject<USkeletalMesh>(NULL, TEXT("/Game/Characters/Mannequins/Meshes/SKM_Quinn_Simple"), NULL, LOAD_None, NULL);
 
 	//StaticMeshをStaticMeshComponentに設定する
-	Sphere->SetStaticMesh(Mesh);
+	Character->SetSkeletalMesh(Mesh);
+
+	//CharacterをRootComponentniにAttachする
+	Character->SetupAttachment(RootComponent);
 
 	//MaterialをStaticMeshに設定する
-	UMaterial* Material = LoadObject<UMaterial>(NULL, TEXT("/Engine/BasicShapes/BasicShapeMaterial"), NULL, LOAD_None, NULL);
+	UMaterial* Material = LoadObject<UMaterial>(NULL, TEXT("/Game/Characters/Mannequins/Materials/Instances/Quinn/MI_Quinn_01"), NULL, LOAD_None, NULL);
 
 	//MaterialをStaticMeshComponentに設定する
-	Sphere->SetMaterial(0, Material);
+	Character->SetMaterial(0, Material);
 
 	//Simulate Physicsを有効にする
-	Sphere->SetSimulatePhysics(true);
+	Character->SetSimulatePhysics(true);
 
 	//SpringArmを追加する
 	//RootComponent→角度を変える

@@ -14,10 +14,29 @@ class KOUHEI_OBSTACLERUN_API ABallPlayer : public APawn
 {
 	GENERATED_BODY()
 
-protected:
+//protected:
+	//character用のStaticmesh : sphere
+	//UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	//	TObjectPtr<UStaticMeshComponent> Character;
+
+	////Cameraを配置するためのSpringArm
+	//UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	//	TObjectPtr<USpringArmComponent> SpringArm;
+
+	////SpringArmの先端に配置するカメラ
+	//UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	//	TObjectPtr<UCameraComponent> Camera;
+public:
+	// Sets default values for this pawn's properties
+	ABallPlayer();
+
+	// Scene Component
+	UPROPERTY(EditAnywhere)
+		TObjectPtr<USceneComponent> DefaultSceneRoot;
+
 	//character用のStaticmesh : sphere
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		TObjectPtr<UStaticMeshComponent> Sphere;
+	TObjectPtr<USkeletalMeshComponent> Character;
 
 	//Cameraを配置するためのSpringArm
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -26,9 +45,7 @@ protected:
 	//SpringArmの先端に配置するカメラ
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<UCameraComponent> Camera;
-public:
-	// Sets default values for this pawn's properties
-	ABallPlayer();
+
 
 protected:
 	// Called when the game starts or when spawned
