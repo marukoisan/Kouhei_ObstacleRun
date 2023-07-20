@@ -40,17 +40,20 @@ ABallPlayer::ABallPlayer()
 	//Simulate Physicsを有効にする
 	Character->SetSimulatePhysics(true);
 
+	//CharacterのRotationの設定をする
+	Character->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+
 	//SpringArmを追加する
 	//RootComponent→角度を変える
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArm->SetupAttachment(RootComponent);
 
+	//Spring Armの長さを調整する
 	//角度を変更する Frotator(Pitch(Y), Yaw(Z), Roll(X))
 	SpringArm->SetRelativeRotation(FRotator(-30.0f, 0.0f, 0.0f));
 
-	//Spring Armの長さを調整する
 	//プレイヤーとカメラの距離
-	SpringArm->TargetArmLength = 450.0f;
+	SpringArm->TargetArmLength = 150.0f;
 
 	//SpringArmからの角度を継承しない
 	SpringArm->bInheritPitch = false;
@@ -63,6 +66,11 @@ ABallPlayer::ABallPlayer()
 	//Cameraを追加する
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	Camera->SetupAttachment(SpringArm);
+
+	//Cameraの位置を変更する
+	Camera->SetRelativeLocation(FVector(-300.0f, 0.0f,  45.0f));
+
+	
 }
 
 // Called when the game starts or when spawned
