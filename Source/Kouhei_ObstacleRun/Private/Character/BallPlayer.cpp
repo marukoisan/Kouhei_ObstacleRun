@@ -2,6 +2,8 @@
 
 
 #include "Character/BallPlayer.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 
 // Sets default values
 ABallPlayer::ABallPlayer()
@@ -43,6 +45,8 @@ ABallPlayer::ABallPlayer()
 	//CharacterのRotationの設定をする
 	Character->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 
+	/*************/
+
 	//SpringArmを追加する
 	//RootComponent→角度を変える
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
@@ -70,6 +74,18 @@ ABallPlayer::ABallPlayer()
 	//Cameraの位置を変更する
 	Camera->SetRelativeLocation(FVector(-300.0f, 0.0f,  45.0f));
 
+	// MotionBlurをオフにする
+	//カメラのMotion Blurを無効にすることでプレイヤーの動きが鮮明になります。
+	Camera->PostProcessSettings.MotionBlurAmount = 0.0f;
+
+	/*************/
+
+	//Input Mapping Context「IM_Controls」を読み込む
+	DefaultMappingContext = LoadObject<UInputMappingContext>(NULL, TEXT("/Game/Mapping/IM_Controls"), NULL, LOAD_None, NULL);
+
+	//Input Action「IA_Control」を読み込む
+	ControlAction = LoadObject<UInputAction>(NULL, TEXT("/Game/Mapping/IA_Control"), NULL, LOAD_None, NULL);
+
 	
 }
 
@@ -78,19 +94,36 @@ void ABallPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	
-}
-
-// Called every frame
-void ABallPlayer::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
+	//Add Input Mapping Context・・・ ConstructorのComponent設定処理
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
 }
 
 // Called to bind functionality to input
 void ABallPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	// Set up action bindings
+	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		//ControlCharacterとIA_ControlのTRiggeredをBindする
+		EnhancedInputComponent->BindAction(ControlAction, ETriggerEvent::Triggered, this, &ABallPlayer::ControlCharacter);
+	}
 
 }
 
+void ABallPlayer::ControlCharacter(const FInputActionValue& Value)
+{
+	//inputのValueはVector2Dに変換できる
+	FVector2D v = Value.Get<FVector2D>();
+
+	//Vectorを計算する
+	FVector ForceVector = FVector(v.Y, v.X, 0.0f) * Speed;
+
+	// Characterに力を加える
+	Character->AddForce(ForceVector, NAME_None, true);
+}
