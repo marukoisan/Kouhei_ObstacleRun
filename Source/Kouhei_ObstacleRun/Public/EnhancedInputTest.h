@@ -3,48 +3,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
-#include "Components/StaticMeshComponent.h"     // 追加
-#include "GameFramework/SpringArmComponent.h"   // 追加
-#include "Camera/CameraComponent.h"             // 追加
+#include "GameFramework/Actor.h"
 #include "InputMappingContext.h"    //追加
 #include "InputAction.h"            //追加
 #include "InputActionValue.h"       //追加
-#include "BallPlayer.generated.h"
+#include "EnhancedInputTest.generated.h"
 
 UCLASS()
-class KOUHEI_OBSTACLERUN_API ABallPlayer : public APawn
+class KOUHEI_OBSTACLERUN_API AEnhancedInputTest : public AActor
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this pawn's properties
-	ABallPlayer();
-
-	// Scene Component
-	UPROPERTY(EditAnywhere)
-		TObjectPtr<USceneComponent> DefaultSceneRoot;
-
-	//Character用のStaticmesh : sphere
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USkeletalMeshComponent> Character;
-
-	//Cameraを配置するためのSpringArm
-	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		TObjectPtr<USpringArmComponent> SpringArm;
-
-	//SpringArmの先端に配置するカメラ
-	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		TObjectPtr<UCameraComponent> Camera;
-
+	AEnhancedInputTest();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	/************/
-
-		/** Called for Action input */
+	/** Called for Action input */
 	void EventAction(const FInputActionValue& Value);
 
 	/** Called for Axis input */
@@ -63,16 +41,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Input)
 		class UInputAction* AxisInput;
 
-	/***********/
-
-
 private:
-	//速度用の変数と速度の初期値
-	float Speed = 300.0f;
-
-	//ダッシュ用の変数と初期値いらなかったらコメントします
-	float Health = 100.0f;
-
 	//Input設定
 	void SetupInput();
 
@@ -83,7 +52,8 @@ private:
 	//Input Event(Axis) イベントハンドエラー関数
 	void PressedAxis(const FInputActionValue& Value);
 
-
+	
 	// Press状態を管理
 	bool IsPressed = false;
+
 };
