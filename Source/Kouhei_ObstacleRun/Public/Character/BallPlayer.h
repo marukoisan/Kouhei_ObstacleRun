@@ -7,9 +7,11 @@
 #include "Components/StaticMeshComponent.h"     // 追加
 #include "GameFramework/SpringArmComponent.h"   // 追加
 #include "Camera/CameraComponent.h"             // 追加
-#include "InputMappingContext.h"    //追加
-#include "InputAction.h"            //追加
-#include "InputActionValue.h"       //追加
+#include "InputMappingContext.h"                // 追加
+#include "InputAction.h"                        // 追加
+#include "InputActionValue.h"                   // 追加
+#include "EnhancedInputComponent.h"             // 追加
+#include "EnhancedInputSubsystems.h"            // 追加
 #include "BallPlayer.generated.h"
 
 UCLASS()
@@ -65,6 +67,9 @@ protected:
 
 	/***********/
 
+	/* Characterのコントロール */
+	void ControlCharacter(const FInputActionValue& Value);
+
 
 private:
 	//速度用の変数と速度の初期値
@@ -87,3 +92,4 @@ private:
 	// Press状態を管理
 	bool IsPressed = false;
 };
+

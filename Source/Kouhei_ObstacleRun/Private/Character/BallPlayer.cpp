@@ -101,6 +101,15 @@ void ABallPlayer::BeginPlay()
 	//Inputê›íËÇçsÇ§
 	SetupInput();
 	
+	////Add Input Mapping Context
+	//if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	//{
+	//	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+	//	{
+	//		Subsystem->AddMappingContext(DefaultMappingContext, 0);
+	//	}
+	//}
+
 }
 
 
@@ -135,7 +144,17 @@ void ABallPlayer::SetupInput()
 			}
 		}
 	}
+
+	////mappingcontextÇê›íËÇ∑ÇÈ
+	//if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	//{
+	//	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+	//	{
+	//		Subsystem->AddMappingContext(DefaultMappingContext, 0);
+	//	}
+	//}
 }
+
 
 
 void ABallPlayer::PressedAction()
@@ -160,14 +179,44 @@ void ABallPlayer::ReleasedAction()
 	IsPressed = false;
 }
 
+//void ABallPlayer::SetupInput(UInputComponent* PlayerInputComponent)
+//{
+//	
+//	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+//	{
+//		EnhancedInputComponent->BindAction(AxisInput, ETriggerEvent::Triggered, this, &ABallPlayer::ControlCharacter);
+//	}
+//
+//}
+
+
 void ABallPlayer::PressedAxis(const FInputActionValue& Value)
 {
 	//input is a Vector2D
 	FVector2D v = Value.Get<FVector2D>();
 
+	////VectorÇåvéZÇ∑ÇÈ
+	FVector ForceVector = FVector(v.Y, v.X, 0.0f) * Speed;
+
+	//// CharacterÇ…óÕÇâ¡Ç¶ÇÈ
+	Character->AddForce(ForceVector, NAME_None, true);
+
 	//Axis Input Value
 	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("X:%f Y:%f"), v.X, v.Y), true, true, FColor::Cyan, 10.0f, TEXT("None"));
 
+
+}
+
+void ABallPlayer::ControlCharacter(const FInputActionValue& Value)
+{
+	//inputÇÃValueÇÕVector2DÇ…ïœä∑Ç≈Ç´ÇÈ
+	FVector2D v = Value.Get<FVector2D>();
+
+	//VectorÇåvéZÇ∑ÇÈ
+	FVector ForceVector = FVector(v.Y, v.X, 0.0f) * Speed;
+
+	//CharacterÇ…óÕÇâ¡Ç¶ÇÈ
+	Character->AddForce(ForceVector, NAME_Name, true);
 
 }
 
