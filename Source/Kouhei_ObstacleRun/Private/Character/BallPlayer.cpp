@@ -195,11 +195,32 @@ void ABallPlayer::PressedAxis(const FInputActionValue& Value)
 	//input is a Vector2D
 	FVector2D v = Value.Get<FVector2D>();
 
+	
+		//find out which way is forward向きを得るもの
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		//get foward vector
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
+		//get right vector
+		const FVector FightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+		//ワールドに置かれている座標を見ているか(アクター)
+		this->AddActorLocalOffset(ForwardDirection * v.Y);
+		AddActorLocalOffset(FightDirection * v.X);
+
+		//スタテックメッシュの座標を見ている(ビューポート上の)
+		//コンポーネントの中にある座標
+		//Character->AddWorldOffset(ForwardDirection,v.Y);
+		//Character->AddWorldOffset(FightDirection,v.X);
+
+	
 	////Vectorを計算する
-	FVector ForceVector = FVector(v.Y, v.X, 0.0f) * Speed;
+	//FVector ForceVector = FVector(v.Y, v.X, 0.0f) * Speed;
 
 	//// Characterに力を加える
-	Character->AddForce(ForceVector, NAME_None, true);
+	//Character->AddForce(ForceVector, NAME_None, true);
 
 	//Axis Input Value
 	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("X:%f Y:%f"), v.X, v.Y), true, true, FColor::Cyan, 10.0f, TEXT("None"));
@@ -219,8 +240,6 @@ void ABallPlayer::ControlCharacter(const FInputActionValue& Value)
 	Character->AddForce(ForceVector, NAME_Name, true);
 
 }
-
-
 
 //void ABallPlayer::PressedAxis(const FInputActionValue& Value)
 //{
