@@ -3,10 +3,11 @@
 
 #include "Character/BallPlayer.h"
 #include "Kismet/KismetSystemLibrary.h" // 追加
-#include "Kismet/GameplayStatics.h" // 追加
-#include "Components/InputComponent.h" // 追加
-#include "EnhancedInputComponent.h" // 追加
-#include "EnhancedInputSubsystems.h" // 追加
+#include "Kismet/GameplayStatics.h"     // 追加
+#include "Components/InputComponent.h"  // 追加
+#include "EnhancedInputComponent.h"     // 追加
+#include "EnhancedInputSubsystems.h"    // 追加
+#include "Kismet/GamePlayStatics.h"     // 追加
 
 // Sets default values
 ABallPlayer::ABallPlayer()
@@ -55,17 +56,22 @@ ABallPlayer::ABallPlayer()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArm->SetupAttachment(RootComponent);
 
+	//PawnのControllerRotationを使用するため使用しない(コントローラーの角度が優先されるから)
 	//Spring Armの長さを調整する
 	//角度を変更する Frotator(Pitch(Y), Yaw(Z), Roll(X))
-	SpringArm->SetRelativeRotation(FRotator(-30.0f, 0.0f, 0.0f));
+	//SpringArm->SetRelativeRotation(FRotator(-30.0f, 0.0f, 0.0f));
 
 	//プレイヤーとカメラの距離
 	SpringArm->TargetArmLength = 150.0f;
 
+	//PawnのControllerRotationを使用する
+	SpringArm->bUsePawnControlRotation = true;
+
+	//PawnのControllerRotationを使用するため使用しない
 	//SpringArmからの角度を継承しない
-	SpringArm->bInheritPitch = false;
+	/*SpringArm->bInheritPitch = false;
 	SpringArm->bInheritYaw = false;
-	SpringArm->bInheritRoll = false;
+	SpringArm->bInheritRoll = false;*/
 
 	//CameraのLagを有効にする
 	SpringArm->bEnableCameraLag = true;
@@ -90,6 +96,8 @@ ABallPlayer::ABallPlayer()
 	//Input Mapping Contextを読み込み
 	DefaultMappingContext = LoadObject<UInputMappingContext>(NULL, TEXT("/Game/Mapping/IM_Controls"), NULL, LOAD_None, NULL);
 
+	// Input Actionの「IA_Look」を読み込む
+	LookAction = LoadObject<UInputAction>(NULL, TEXT("/Game/Mapping/IA_Look"), NULL, LOAD_None, NULL);
 	
 }
 
@@ -153,6 +161,43 @@ void ABallPlayer::SetupInput()
 	//		Subsystem->AddMappingContext(DefaultMappingContext, 0);
 	//	}
 	//}
+}
+
+//Called to vind functionlity to input(機能を呼び出しています)
+void ABallPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	//Set up action bindings(接続する)
+	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		//ControlBallとIA_ControlのTriggeredをBindする
+		EnhancedInputComponent->BindAction(AxisInput, ETriggerEvent::Triggered, this, &ABallPlayer::ControlCharacter);
+
+		//LookとIA_LookのTriggeredをBindする
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABallPlayer::Look);
+	}
+
+}
+
+//コントローラの角度を変更して、カメラの操作を制御する処理を実装します
+void ABallPlayer::Look(const FInputActionValue& Value)
+{
+	//inputのValueはVector2Dに変換できる
+	FVector2D v = Value.Get<FVector2D>();
+
+	if (Controller != nullptr)
+	{
+		//コントローラにヨー入力とピッチ入力を追加する
+		AddControllerYawInput(v.X);
+		AddControllerPitchInput(v.Y);
+
+		//Pawnが持っているControlの角度を取得する
+		FRotator controlRotate = GetControlRotation();
+
+		//PlayerControllerの角度を設定する
+		UGameplayStatics::GetPlayerController(this, 0)->SetControlRotation(FRotator(controlRotate.Pitch, controlRotate.Yaw, 0.0f));
+	}
 }
 
 
@@ -240,15 +285,3 @@ void ABallPlayer::ControlCharacter(const FInputActionValue& Value)
 	Character->AddForce(ForceVector, NAME_Name, true);
 
 }
-
-//void ABallPlayer::PressedAxis(const FInputActionValue& Value)
-//{
-//	//inputのValueはVector2Dに変換できる
-//	FVector2D v = Value.Get<FVector2D>();
-//
-//	//Vectorを計算する
-//	FVector ForceVector = FVector(v.Y, v.X, 0.0f) * Speed;
-//
-//	// Characterに力を加える
-//	Character->AddForce(ForceVector, NAME_None, true);
-//}
