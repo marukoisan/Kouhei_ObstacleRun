@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"     // 追加
 #include "EnhancedInputSubsystems.h"    // 追加
 #include "Kismet/GamePlayStatics.h"     // 追加
+#include "Kismet/KismetMathLibrary.h"	// 追加
 
 // Sets default values
 ABallPlayer::ABallPlayer()
@@ -88,6 +89,18 @@ ABallPlayer::ABallPlayer()
 	Camera->PostProcessSettings.MotionBlurAmount = 0.0f;
 
 	/*************/
+	//Arrowを追加する
+	Arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowComponent"));
+	Arrow->SetupAttachment(Camera);
+
+	//Characterの頭上に移動するようにLocationを設定する
+	Arrow->SetRelativeLocation(FVector(400.0f, 0.0f, 200.0f));
+
+	// Arrowを表示させるようにする
+	//後で見えなくなるようにするのでtrueにするのを忘れないようにする
+	Arrow->bHiddenInGame = false;
+
+	/*************/
 
 	//Input Actionを読み込み
 	ActionInput = LoadObject<UInputAction>(NULL, TEXT("/Game/Mapping/IA_Jump"), NULL, LOAD_None, NULL);
@@ -163,23 +176,6 @@ void ABallPlayer::SetupInput()
 	//}
 }
 
-//Called to vind functionlity to input(機能を呼び出しています)
-void ABallPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	//Set up action bindings(接続する)
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		//ControlBallとIA_ControlのTriggeredをBindする
-		EnhancedInputComponent->BindAction(AxisInput, ETriggerEvent::Triggered, this, &ABallPlayer::ControlCharacter);
-
-		//LookとIA_LookのTriggeredをBindする
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABallPlayer::Look);
-	}
-
-}
-
 //コントローラの角度を変更して、カメラの操作を制御する処理を実装します
 void ABallPlayer::Look(const FInputActionValue& Value)
 {
@@ -194,6 +190,9 @@ void ABallPlayer::Look(const FInputActionValue& Value)
 
 		//Pawnが持っているControlの角度を取得する
 		FRotator controlRotate = GetControlRotation();
+
+		//controllerのPitchの角度を制限する
+		double limitPitchAngle = UKismetMathLibrary::ClampAngle(controlRotate.Pitch, -40.0f, -10.0f);
 
 		//PlayerControllerの角度を設定する
 		UGameplayStatics::GetPlayerController(this, 0)->SetControlRotation(FRotator(controlRotate.Pitch, controlRotate.Yaw, 0.0f));
@@ -241,25 +240,24 @@ void ABallPlayer::PressedAxis(const FInputActionValue& Value)
 	FVector2D v = Value.Get<FVector2D>();
 
 	
-		//find out which way is forward向きを得るもの
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+	//find out which way is forward向きを得るもの
+	const FRotator Rotation = Controller->GetControlRotation();
+	const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-		//get foward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	//get foward vector
+	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-		//get right vector
-		const FVector FightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	//get right vector
+	const FVector FightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		//ワールドに置かれている座標を見ているか(アクター)
-		this->AddActorLocalOffset(ForwardDirection * v.Y);
-		AddActorLocalOffset(FightDirection * v.X);
+	//ワールドに置かれている座標を見ているか(アクター)
+	this->AddActorLocalOffset(ForwardDirection * v.Y * Speed);
+	AddActorLocalOffset(FightDirection * v.X * Speed);
 
-		//スタテックメッシュの座標を見ている(ビューポート上の)
-		//コンポーネントの中にある座標
-		//Character->AddWorldOffset(ForwardDirection,v.Y);
-		//Character->AddWorldOffset(FightDirection,v.X);
-
+	//スタテックメッシュの座標を見ている(ビューポート上の)
+	//コンポーネントの中にある座標
+	//Character->AddWorldOffset(ForwardDirection,v.Y);
+	//Character->AddWorldOffset(FightDirection,v.X);
 	
 	////Vectorを計算する
 	//FVector ForceVector = FVector(v.Y, v.X, 0.0f) * Speed;
@@ -280,6 +278,9 @@ void ABallPlayer::ControlCharacter(const FInputActionValue& Value)
 
 	//Vectorを計算する
 	FVector ForceVector = FVector(v.Y, v.X, 0.0f) * Speed;
+
+	//Arrowの進行方向のVectorを計算する
+	FVector ArrowForceVector = UKismetMathLibrary::TransformDirection(Arrow->GetComponentToWorld(), ForceVector);
 
 	//Characterに力を加える
 	Character->AddForce(ForceVector, NAME_Name, true);

@@ -7,6 +7,7 @@
 #include "Components/StaticMeshComponent.h"     // 追加
 #include "GameFramework/SpringArmComponent.h"   // 追加
 #include "Camera/CameraComponent.h"             // 追加
+#include "Components/ArrowComponent.h"			// 追加
 #include "InputMappingContext.h"                // 追加
 #include "InputAction.h"                        // 追加
 #include "InputActionValue.h"                   // 追加
@@ -40,7 +41,22 @@ public:
 		TObjectPtr<UCameraComponent> Camera;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	//Called to vind functionlity to input(機能を呼び出しています)
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override
+	{
+		Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+		//Set up action bindings(接続する)
+		if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+		{
+			//ControlBallとIA_ControlのTriggeredをBindする
+			EnhancedInputComponent->BindAction(AxisInput, ETriggerEvent::Triggered, this, &ABallPlayer::ControlCharacter);
+
+			//LookとIA_LookのTriggeredをBindする
+			EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ABallPlayer::Look);
+		}
+
+	}
 
 
 protected:
@@ -74,6 +90,11 @@ protected:
 	void ControlCharacter(const FInputActionValue& Value);
 
 	/**********/
+	//進行方向を表示するArrowComponent
+	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		TObjectPtr<UArrowComponent> Arrow;//Arrow変数を作成
+
+	/*********/
 
 	/* Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPriateAccess = "true"))
@@ -84,7 +105,7 @@ protected:
 
 private:
 	//速度用の変数と速度の初期値
-	float Speed = 300.0f;
+	float Speed = 10.0f;
 
 	//ダッシュ用の変数と初期値いらなかったらコメントします
 	float Health = 100.0f;
