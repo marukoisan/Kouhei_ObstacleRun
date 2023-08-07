@@ -50,6 +50,11 @@ ABallPlayer::ABallPlayer()
 	//CharacterのRotationの設定をする
 	Character->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 
+	//CapsuleComponentの設定
+	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
+	//ブループリントから予測で発見できます
+	//CapsuleComponent->
+	
 	/*************/
 
 	//SpringArmを追加する
@@ -82,7 +87,7 @@ ABallPlayer::ABallPlayer()
 	Camera->SetupAttachment(SpringArm);
 
 	//Cameraの位置を変更する
-	Camera->SetRelativeLocation(FVector(-300.0f, 0.0f,  45.0f));
+	Camera->SetRelativeLocation(FVector(-300.0f, 0.0f,  140.0f));
 
 	// MotionBlurをオフにする
 	//カメラのMotion Blurを無効にすることでプレイヤーの動きが鮮明になります。

@@ -13,7 +13,9 @@
 #include "InputActionValue.h"                   // 追加
 #include "EnhancedInputComponent.h"             // 追加
 #include "EnhancedInputSubsystems.h"            // 追加
+#include "Components/CapsuleComponent.h"        // 追加
 #include "BallPlayer.generated.h"
+
 
 UCLASS()
 class KOUHEI_OBSTACLERUN_API ABallPlayer : public APawn
@@ -39,6 +41,11 @@ public:
 	//SpringArmの先端に配置するカメラ
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		TObjectPtr<UCameraComponent> Camera;
+
+	//CapsuleComponentの作成
+	UPROPERTY(Category = CapsuleComponent, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		TObjectPtr<UCapsuleComponent> CapsuleComponent;
+
 
 	// Called to bind functionality to input
 	//Called to vind functionlity to input(機能を呼び出しています)
