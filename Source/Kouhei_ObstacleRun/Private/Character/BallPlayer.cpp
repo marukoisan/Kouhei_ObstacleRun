@@ -27,7 +27,6 @@ ABallPlayer::ABallPlayer()
 
 	//StaticMeshComponentを追加し、RootComponentに設定する
 	Character = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("USkeletalMeshComponent"));
-	//RootComponent = Character;
 
 	//StaticMeshをLaodしてStaticMeshComponentのStaticMeshに設定する
 	USkeletalMesh* Mesh = LoadObject<USkeletalMesh>(NULL, TEXT("/Game/Characters/Mannequins/Meshes/SKM_Quinn_Simple"), NULL, LOAD_None, NULL);
@@ -46,14 +45,25 @@ ABallPlayer::ABallPlayer()
 
 	//Simulate Physicsを有効にする
 	Character->SetSimulatePhysics(true);
+	//CollisionBodyInstances
+	
 
 	//CharacterのRotationの設定をする
 	Character->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+	Character->SetRelativeLocation(FVector(0.0f, 0.0f, -90.0f));
 
 	//CapsuleComponentの設定
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
 	//ブループリントから予測で発見できます
-	//CapsuleComponent->
+	CapsuleComponent->SetCapsuleHalfHeight(90.0, true);
+	CapsuleComponent->SetCapsuleRadius(35.0, true);
+	CapsuleComponent->SetEnableGravity(true);
+	CapsuleComponent->SetGenerateOverlapEvents(true);
+	//プレイヤーのコリジョン設定のところ
+	CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
+
+	//CapsuleComponentを親子付け
+	CapsuleComponent->SetupAttachment(DefaultSceneRoot);
 	
 	/*************/
 
@@ -256,8 +266,8 @@ void ABallPlayer::PressedAxis(const FInputActionValue& Value)
 	const FVector FightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
 	//ワールドに置かれている座標を見ているか(アクター)
-	this->AddActorLocalOffset(ForwardDirection * v.Y * Speed);
-	AddActorLocalOffset(FightDirection * v.X * Speed);
+	this->AddActorLocalOffset(ForwardDirection * v.Y * Speed, true);
+	AddActorLocalOffset(FightDirection * v.X * Speed, true);
 
 	//スタテックメッシュの座標を見ている(ビューポート上の)
 	//コンポーネントの中にある座標
