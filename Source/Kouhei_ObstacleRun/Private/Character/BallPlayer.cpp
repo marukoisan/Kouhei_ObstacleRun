@@ -50,7 +50,7 @@ ABallPlayer::ABallPlayer()
 
 	//CharacterのRotationの設定をする
 	Character->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
-	Character->SetRelativeLocation(FVector(0.0f, 0.0f, -90.0f));
+	Character->SetRelativeLocation(FVector(0.0f, 0.0f, -93.0f));
 
 	//CapsuleComponentの設定
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
@@ -61,6 +61,14 @@ ABallPlayer::ABallPlayer()
 	CapsuleComponent->SetGenerateOverlapEvents(true);
 	//プレイヤーのコリジョン設定のところ
 	CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
+	//Overlapのイベントを発生させる
+	CapsuleComponent->SetGenerateOverlapEvents(true);
+	//物理が自動プロシキにレプリケートされる場合はtrue
+	CapsuleComponent->bReplicatePhysicsToAutonomousProxy;
+	//PhysicsVolumeを更新するか銅貨を判断します。
+	CapsuleComponent->SetShouldUpdatePhysicsVolume(true);
+	
+	
 
 	//CapsuleComponentを親子付け
 	CapsuleComponent->SetupAttachment(DefaultSceneRoot);
@@ -102,6 +110,9 @@ ABallPlayer::ABallPlayer()
 	// MotionBlurをオフにする
 	//カメラのMotion Blurを無効にすることでプレイヤーの動きが鮮明になります。
 	Camera->PostProcessSettings.MotionBlurAmount = 0.0f;
+
+	//Set Field Of View
+	Camera->SetFieldOfView(90.0f);
 
 	/*************/
 	//Arrowを追加する
