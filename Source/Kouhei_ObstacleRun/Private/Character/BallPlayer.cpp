@@ -23,7 +23,31 @@ ABallPlayer::ABallPlayer()
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 
 	//SceneComponentをRootComponentに設定する
-	RootComponent = DefaultSceneRoot;
+	//RootComponent = DefaultSceneRoot;
+
+	//CapsuleComponentの設定
+	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
+	//ブループリントから予測で発見できます
+	CapsuleComponent->SetMobility(EComponentMobility::Movable);
+	CapsuleComponent->SetCapsuleHalfHeight(90.0, true);
+	CapsuleComponent->SetCapsuleRadius(35.0, true);
+	CapsuleComponent->SetEnableGravity(true);
+	CapsuleComponent->SetLinearDamping(0.01);
+	CapsuleComponent->SetShouldUpdatePhysicsVolume(true);
+	CapsuleComponent->SetGenerateOverlapEvents(true);
+	//プレイヤーのコリジョン設定のところ
+	CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
+	//Overlapのイベントを発生させる
+	CapsuleComponent->SetGenerateOverlapEvents(true);
+	//物理が自動プロシキにレプリケートされる場合はtrue
+	CapsuleComponent->bReplicatePhysicsToAutonomousProxy;
+	//PhysicsVolumeを更新するかどうかを判断します。
+	CapsuleComponent->SetShouldUpdatePhysicsVolume(true);
+	
+	//RootComponentにCapsuleComponentを入れる
+	RootComponent = CapsuleComponent;
+	
+	/******************/
 
 	//StaticMeshComponentを追加し、RootComponentに設定する
 	Character = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("USkeletalMeshComponent"));
@@ -35,7 +59,7 @@ ABallPlayer::ABallPlayer()
 	Character->SetSkeletalMesh(Mesh);
 
 	//CharacterをRootComponentniにAttachする
-	Character->SetupAttachment(RootComponent);
+	Character->SetupAttachment(CapsuleComponent);
 
 	//MaterialをStaticMeshに設定する
 	UMaterial* Material = LoadObject<UMaterial>(NULL, TEXT("/Game/Characters/Mannequins/Materials/Instances/Quinn/MI_Quinn_01"), NULL, LOAD_None, NULL);
@@ -44,34 +68,17 @@ ABallPlayer::ABallPlayer()
 	Character->SetMaterial(0, Material);
 
 	//Simulate Physicsを有効にする
-	Character->SetSimulatePhysics(true);
+	//Character->SetSimulatePhysics(true);
 	//CollisionBodyInstances
-	
+
 
 	//CharacterのRotationの設定をする
 	Character->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 	Character->SetRelativeLocation(FVector(0.0f, 0.0f, -93.0f));
-
-	//CapsuleComponentの設定
-	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
-	//ブループリントから予測で発見できます
-	CapsuleComponent->SetCapsuleHalfHeight(90.0, true);
-	CapsuleComponent->SetCapsuleRadius(35.0, true);
-	CapsuleComponent->SetEnableGravity(true);
-	CapsuleComponent->SetGenerateOverlapEvents(true);
-	//プレイヤーのコリジョン設定のところ
-	CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
-	//Overlapのイベントを発生させる
-	CapsuleComponent->SetGenerateOverlapEvents(true);
-	//物理が自動プロシキにレプリケートされる場合はtrue
-	CapsuleComponent->bReplicatePhysicsToAutonomousProxy;
-	//PhysicsVolumeを更新するか銅貨を判断します。
-	CapsuleComponent->SetShouldUpdatePhysicsVolume(true);
-	
 	
 
 	//CapsuleComponentを親子付け
-	CapsuleComponent->SetupAttachment(DefaultSceneRoot);
+	//CapsuleComponent->SetupAttachment(DefaultSceneRoot);
 	
 	/*************/
 
@@ -264,7 +271,7 @@ void ABallPlayer::PressedAxis(const FInputActionValue& Value)
 {
 	//input is a Vector2D
 	FVector2D v = Value.Get<FVector2D>();
-
+	
 	
 	//find out which way is forward向きを得るもの
 	const FRotator Rotation = Controller->GetControlRotation();
@@ -280,6 +287,7 @@ void ABallPlayer::PressedAxis(const FInputActionValue& Value)
 	this->AddActorLocalOffset(ForwardDirection * v.Y * Speed, true);
 	AddActorLocalOffset(FightDirection * v.X * Speed, true);
 
+	
 	//スタテックメッシュの座標を見ている(ビューポート上の)
 	//コンポーネントの中にある座標
 	//Character->AddWorldOffset(ForwardDirection,v.Y);
