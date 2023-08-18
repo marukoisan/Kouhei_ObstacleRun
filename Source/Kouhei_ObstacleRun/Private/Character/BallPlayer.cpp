@@ -40,7 +40,7 @@ ABallPlayer::ABallPlayer()
 	//Overlapのイベントを発生させる
 	CapsuleComponent->SetGenerateOverlapEvents(true);
 	//物理が自動プロシキにレプリケートされる場合はtrue
-	CapsuleComponent->bReplicatePhysicsToAutonomousProxy;
+	//CapsuleComponent->bReplicatePhysicsToAutonomousProxy;
 	//PhysicsVolumeを更新するかどうかを判断します。
 	CapsuleComponent->SetShouldUpdatePhysicsVolume(true);
 	
@@ -144,6 +144,9 @@ ABallPlayer::ABallPlayer()
 
 	// Input Actionの「IA_Look」を読み込む
 	LookAction = LoadObject<UInputAction>(NULL, TEXT("/Game/Mapping/IA_Look"), NULL, LOAD_None, NULL);
+
+	//Input Actionの「IA_Jump」を読み込む
+	JumpAction = LoadObject<UInputAction>(NULL, TEXT("/Game/Mapping/IA_Jump"), NULL, LOAD_None, NULL);
 	
 }
 
@@ -180,9 +183,12 @@ void ABallPlayer::SetupInput()
 		//Set up action bindings
 		if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
 		{
-			//Input Action
-			EnhancedInputComponent->BindAction(ActionInput, ETriggerEvent::Triggered, this, &ABallPlayer::PressedAction);
-			EnhancedInputComponent->BindAction(ActionInput, ETriggerEvent::Completed, this, &ABallPlayer::ReleasedAction);
+			//Input ActionをIA_Jumpに置き換える
+			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ABallPlayer::PressedAction);
+			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ABallPlayer::ReleasedAction);
+
+			//JumpとIA_JumpのTriggerdをBindする
+			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ABallPlayer::Jump);
 
 			//input Axis
 			EnhancedInputComponent->BindAction(AxisInput, ETriggerEvent::Triggered, this, &ABallPlayer::PressedAxis);
@@ -238,6 +244,7 @@ void ABallPlayer::PressedAction()
 {
 	if (!IsPressed)
 	{
+		void Jump(const FInputActionValue & Value);
 		//pressed
 		UKismetSystemLibrary::PrintString(this, TEXT("Pressed"), true, true, FColor::Cyan, 10.0f, TEXT("None"));
 
@@ -319,4 +326,17 @@ void ABallPlayer::ControlCharacter(const FInputActionValue& Value)
 	//Characterに力を加える
 	Character->AddForce(ForceVector, NAME_Name, true);
 
+}
+
+//Jump関数の作成
+void ABallPlayer::Jump(const FInputActionValue& Value)
+{
+	//inputのvalueはboolに変換できる
+	if (const bool v = Value.Get<bool>() && CanJump)
+	{
+		
+		AddActorLocalOffset(FVector(0.0f, 0.0f, JumpImpluse),true);
+		Character->AddImpulse(FVector(0.0f, 0.0f, JumpImpluse), TEXT("None"), true);
+		CanJump = false;
+	}
 }

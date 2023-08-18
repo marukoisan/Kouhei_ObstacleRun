@@ -110,6 +110,13 @@ protected:
 	/* 始点を操作するための関数 */
 	void Look(const FInputActionValue& Value);
 
+	/* ジャンプする */
+	void Jump(const FInputActionValue& Value);
+
+	/*  Jump Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPribateAccess = "true"))
+		class UInputAction* JumpAction;
+
 private:
 	//速度用の変数と速度の初期値
 	float Speed = 10.0f;
@@ -130,5 +137,11 @@ private:
 
 	// Press状態を管理
 	bool IsPressed = false;
+
+	//ジャンプに加える力
+	float JumpImpluse = 500.0f;
+
+	//ジャンプができるか判定するフラグ
+	bool CanJump = false;
 };
 
