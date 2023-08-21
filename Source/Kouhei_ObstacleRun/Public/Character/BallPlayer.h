@@ -117,6 +117,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPribateAccess = "true"))
 		class UInputAction* JumpAction;
 
+	/*Hit EventをBindingする関数*/
+	
+
 private:
 	//速度用の変数と速度の初期値
 	float Speed = 10.0f;

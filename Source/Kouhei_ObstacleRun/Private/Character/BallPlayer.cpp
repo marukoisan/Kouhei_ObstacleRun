@@ -68,9 +68,15 @@ ABallPlayer::ABallPlayer()
 	Character->SetMaterial(0, Material);
 
 	//Simulate Physicsを有効にする
-	//Character->SetSimulatePhysics(true);
+	Character->SetSimulatePhysics(true);
 	//CollisionBodyInstances
 
+	//CollisionPrisetを「PhysicsActor」に変更する
+
+	Character->SetCollisionProfileName(TEXT("PhysicsActor"));
+
+	//Hit Eventを有効にする
+	Character->BodyInstance.bNotifyRigidBodyCollision = true;
 
 	//CharacterのRotationの設定をする
 	Character->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
@@ -79,6 +85,8 @@ ABallPlayer::ABallPlayer()
 
 	//CapsuleComponentを親子付け
 	//CapsuleComponent->SetupAttachment(DefaultSceneRoot);
+
+
 	
 	/*************/
 
