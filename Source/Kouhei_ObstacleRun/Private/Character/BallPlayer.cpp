@@ -43,6 +43,15 @@ ABallPlayer::ABallPlayer()
 	//CapsuleComponent->bReplicatePhysicsToAutonomousProxy;
 	//PhysicsVolumeを更新するかどうかを判断します。
 	CapsuleComponent->SetShouldUpdatePhysicsVolume(true);
+
+	//Hit Eventを有効にする
+	CapsuleComponent->BodyInstance.bNotifyRigidBodyCollision = true;
+
+	//物理演算の設定をオンにする
+	CapsuleComponent->SetSimulatePhysics(true);
+
+	//重力の設定をオンにする
+	CapsuleComponent->SetEnableGravity(true);
 	
 	//RootComponentにCapsuleComponentを入れる
 	RootComponent = CapsuleComponent;
@@ -68,20 +77,23 @@ ABallPlayer::ABallPlayer()
 	Character->SetMaterial(0, Material);
 
 	//Simulate Physicsを有効にする
-	Character->SetSimulatePhysics(true);
+	//Character->SetSimulatePhysics(true);
 	//CollisionBodyInstances
 
 	//CollisionPrisetを「PhysicsActor」に変更する
 
-	Character->SetCollisionProfileName(TEXT("PhysicsActor"));
+	//Character->SetCollisionProfileName(TEXT("PhysicsActor"));
 
 	//Hit Eventを有効にする
-	Character->BodyInstance.bNotifyRigidBodyCollision = true;
+	//Character->BodyInstance.bNotifyRigidBodyCollision = true;
 
 	//CharacterのRotationの設定をする
 	Character->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 	Character->SetRelativeLocation(FVector(0.0f, 0.0f, -93.0f));
 	
+	//重力の設定をしてみる
+	//Character->SetEnableBodyGravity(true,);
+
 
 	//CapsuleComponentを親子付け
 	//CapsuleComponent->SetupAttachment(DefaultSceneRoot);
@@ -347,4 +359,11 @@ void ABallPlayer::Jump(const FInputActionValue& Value)
 		Character->AddImpulse(FVector(0.0f, 0.0f, JumpImpluse), TEXT("None"), true);
 		CanJump = false;
 	}
+}
+
+//HitイベントにBindingした関数でCanaJumpを有効にする処理を実装します
+void ABallPlayer::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
+{
+	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
+	CanJump = true;
 }

@@ -118,7 +118,7 @@ protected:
 		class UInputAction* JumpAction;
 
 	/*Hit EventをBindingする関数*/
-	
+	virtual void NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 
 private:
 	//速度用の変数と速度の初期値
@@ -142,7 +142,7 @@ private:
 	bool IsPressed = false;
 
 	//ジャンプに加える力
-	float JumpImpluse = 500.0f;
+	float JumpImpluse = 200.0f;
 
 	//ジャンプができるか判定するフラグ
 	bool CanJump = false;
