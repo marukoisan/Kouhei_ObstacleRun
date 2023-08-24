@@ -47,8 +47,10 @@ ABallPlayer::ABallPlayer()
 	//Hit Eventを有効にする
 	CapsuleComponent->BodyInstance.bNotifyRigidBodyCollision = true;
 
+	
+
 	//物理演算の設定をオンにする
-	CapsuleComponent->SetSimulatePhysics(true);
+	//CapsuleComponent->SetSimulatePhysics(true);
 
 	//重力の設定をオンにする
 	CapsuleComponent->SetEnableGravity(true);
@@ -366,4 +368,10 @@ void ABallPlayer::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Oth
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 	CanJump = true;
+}
+
+//Event tickの呼び出し
+void ABallPlayer::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 }

@@ -65,6 +65,9 @@ public:
 
 	}
 
+	//event tick‚ÌŒÄ‚Ño‚µ
+	virtual void Tick(float DeltaSeconds) override;
+
 
 protected:
 	// Called when the game starts or when spawned
