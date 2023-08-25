@@ -130,6 +130,9 @@ private:
 	//ダッシュ用の変数と初期値いらなかったらコメントします
 	float Health = 100.0f;
 
+	//下方向に加えるための力の変数
+	float Under = -10.0f;
+
 	//Input設定
 	void SetupInput();
 

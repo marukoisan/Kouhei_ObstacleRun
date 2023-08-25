@@ -169,6 +169,10 @@ ABallPlayer::ABallPlayer()
 
 	//Input Actionの「IA_Jump」を読み込む
 	JumpAction = LoadObject<UInputAction>(NULL, TEXT("/Game/Mapping/IA_Jump"), NULL, LOAD_None, NULL);
+
+	//アニメーションBPを読み込む
+	//Animation = LoadObject<>
+	
 	
 }
 
@@ -374,4 +378,7 @@ void ABallPlayer::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Oth
 void ABallPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	//CapsuleComponent->AddLocalOffset(FVector(0.0f, 0.0f, Under), true);
+	AddActorLocalOffset(FVector(0.0f, 0.0f, Under), true);
+	
 }
