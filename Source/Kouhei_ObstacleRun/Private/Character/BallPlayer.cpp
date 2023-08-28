@@ -100,6 +100,10 @@ ABallPlayer::ABallPlayer()
 	//CapsuleComponentを親子付け
 	//CapsuleComponent->SetupAttachment(DefaultSceneRoot);
 
+	//set Animation Mode
+	Character->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+	const ConstructorHelpers::FObjectFinder<UAnimBlueprint>AnimObj(TEXT("AnimBlueprint'/Game/Characters/Mannequins/Animations/ABP_Manny'"));
+	Character->SetAnimClass(AnimObj.Object->GeneratedClass);
 
 	
 	/*************/
@@ -317,6 +321,7 @@ void ABallPlayer::PressedAxis(const FInputActionValue& Value)
 	const FVector FightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
 	//ワールドに置かれている座標を見ているか(アクター)
+	CharacterVector += ForwardDirection * v.Y * Speed;
 	this->AddActorLocalOffset(ForwardDirection * v.Y * Speed, true);
 	AddActorLocalOffset(FightDirection * v.X * Speed, true);
 
@@ -381,4 +386,17 @@ void ABallPlayer::Tick(float DeltaTime)
 	//CapsuleComponent->AddLocalOffset(FVector(0.0f, 0.0f, Under), true);
 	AddActorLocalOffset(FVector(0.0f, 0.0f, Under), true);
 	
+}
+
+
+//CharacterVelocity()の呼び出し
+FVector ABallPlayer::GetForwardDirection()
+{
+	return CharacterVector;
+}
+
+//GetGround()の呼び出し
+bool ABallPlayer::GetGround()
+{
+	return CanJump;
 }

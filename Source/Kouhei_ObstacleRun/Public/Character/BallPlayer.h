@@ -67,7 +67,14 @@ public:
 
 	//event tickの呼び出し
 	virtual void Tick(float DeltaSeconds) override;
+	
+	//キャラクターのスピードをもらう関数
+	UFUNCTION(BlueprintCallable)
+		FVector GetForwardDirection();
 
+	//地上にいるかの判定をもらう関数
+	UFUNCTION(BlueprintCallable)
+		bool GetGround();
 
 protected:
 	// Called when the game starts or when spawned
@@ -121,7 +128,8 @@ protected:
 		class UInputAction* JumpAction;
 
 	/*Hit EventをBindingする関数*/
-	virtual void NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
+	UFUNCTION(BlueprintCallable)
+		virtual void NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 
 private:
 	//速度用の変数と速度の初期値
@@ -152,5 +160,9 @@ private:
 
 	//ジャンプができるか判定するフラグ
 	bool CanJump = false;
+
+	//変数の作成
+	FVector CharacterVector;
+
 };
 
