@@ -76,6 +76,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 		bool GetGround();
 
+	//アニメーション用の速度
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variable")
+		float AnimationSpeed = 0.0f;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -130,6 +134,8 @@ protected:
 	/*Hit EventをBindingする関数*/
 	UFUNCTION(BlueprintCallable)
 		virtual void NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
+
+
 
 private:
 	//速度用の変数と速度の初期値
