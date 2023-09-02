@@ -9,6 +9,7 @@
 #include "EnhancedInputSubsystems.h"    // 追加
 #include "Kismet/GamePlayStatics.h"     // 追加
 #include "Kismet/KismetMathLibrary.h"	// 追加
+#include "Engine/CollisionProfile.h"    // 追加
 
 // Sets default values
 ABallPlayer::ABallPlayer()
@@ -36,7 +37,10 @@ ABallPlayer::ABallPlayer()
 	CapsuleComponent->SetShouldUpdatePhysicsVolume(true);
 	CapsuleComponent->SetGenerateOverlapEvents(true);
 	//プレイヤーのコリジョン設定のところ
-	CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
+	//CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
+	CapsuleComponent->SetCollisionProfileName(UCollisionProfile::BlockAll_ProfileName);
+
+
 	//Overlapのイベントを発生させる
 	CapsuleComponent->SetGenerateOverlapEvents(true);
 	//物理が自動プロシキにレプリケートされる場合はtrue
@@ -157,7 +161,7 @@ ABallPlayer::ABallPlayer()
 
 	// Arrowを表示させるようにする
 	//後で見えなくなるようにするのでtrueにするのを忘れないようにする
-	Arrow->bHiddenInGame = false;
+	Arrow->bHiddenInGame = true;
 
 	/*************/
 
@@ -276,7 +280,7 @@ void ABallPlayer::PressedAction()
 	{
 		void Jump(const FInputActionValue & Value);
 		//pressed
-		UKismetSystemLibrary::PrintString(this, TEXT("Pressed"), true, true, FColor::Cyan, 10.0f, TEXT("None"));
+		//UKismetSystemLibrary::PrintString(this, TEXT("Pressed"), true, true, FColor::Cyan, 10.0f, TEXT("None"));
 
 		//press状態に設定
 		IsPressed = true;
@@ -287,7 +291,7 @@ void ABallPlayer::PressedAction()
 void ABallPlayer::ReleasedAction()
 {
 	//Relesed
-	UKismetSystemLibrary::PrintString(this, TEXT("Released"), true, true, FColor::Cyan, 10.0f, TEXT("None"));
+	//UKismetSystemLibrary::PrintString(this, TEXT("Released"), true, true, FColor::Cyan, 10.0f, TEXT("None"));
 
 	//Press状態を解除
 	IsPressed = false;
@@ -338,7 +342,7 @@ void ABallPlayer::PressedAxis(const FInputActionValue& Value)
 	//Character->AddForce(ForceVector, NAME_None, true);
 
 	//Axis Input Value
-	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("X:%f Y:%f"), v.X, v.Y), true, true, FColor::Cyan, 10.0f, TEXT("None"));
+	//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("X:%f Y:%f"), v.X, v.Y), true, true, FColor::Cyan, 10.0f, TEXT("None"));
 
 
 }
@@ -377,6 +381,8 @@ void ABallPlayer::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Oth
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 	CanJump = true;
+
+	AddActorWorldOffset(HitNormal);
 }
 
 //Event tickの呼び出し
